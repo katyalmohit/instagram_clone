@@ -1,3 +1,3 @@
-import 'package:material_color_utilities/';
+import 'package:flutter/material.dart';
 
 const webScreenSize = 600;
