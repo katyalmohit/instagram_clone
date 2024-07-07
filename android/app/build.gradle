@@ -12,6 +12,9 @@ if (localPropertiesFile.exists()) {
         localProperties.load(reader)
     }
 }
+plugin{
+    id("com.google.gms.google-services")
+}
 
 def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
 if (flutterVersionCode == null) {
@@ -42,6 +45,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+        multiDexEnabled = true
     }
 
     buildTypes {
