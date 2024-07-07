@@ -1,6 +1,10 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -15,6 +19,7 @@ class SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  Uint8List? _image;
 
   @override
   void dispose() {
@@ -23,6 +28,13 @@ class SignupScreenState extends State<SignupScreen> {
     _passwordController.dispose();
     _bioController.dispose();
     _usernameController.dispose();
+  }
+
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
   }
 
   @override
@@ -49,16 +61,21 @@ class SignupScreenState extends State<SignupScreen> {
             //circular widget to accept and show our selected files
             Stack(
               children: [
-                const CircleAvatar(
-                  radius: 64,
-                  backgroundImage: NetworkImage(
-                      'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/42d4d4c5-7c8d-4a7a-85d3-d639390fda35/dfgjtob-2fce0d48-8173-4476-8d65-55dfa73b358f.png/v1/fill/w_894,h_894,q_70,strp/lord_inosuke_coming_through__by_ndnhan_dfgjtob-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzQyZDRkNGM1LTdjOGQtNGE3YS04NWQzLWQ2MzkzOTBmZGEzNVwvZGZnanRvYi0yZmNlMGQ0OC04MTczLTQ0NzYtOGQ2NS01NWRmYTczYjM1OGYucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.hVxySQNAxPCj5abYFSylBCTDxrHP4HsLKJd7pXNXrfE'),
-                ),
+                _image != null
+                    ? CircleAvatar(
+                        radius: 64,
+                        backgroundImage: MemoryImage(_image!),
+                      )
+                    : const CircleAvatar(
+                        radius: 64,
+                        backgroundImage: NetworkImage(
+                            'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/42d4d4c5-7c8d-4a7a-85d3-d639390fda35/dfgjtob-2fce0d48-8173-4476-8d65-55dfa73b358f.png/v1/fill/w_894,h_894,q_70,strp/lord_inosuke_coming_through__by_ndnhan_dfgjtob-pre.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTI4MCIsInBhdGgiOiJcL2ZcLzQyZDRkNGM1LTdjOGQtNGE3YS04NWQzLWQ2MzkzOTBmZGEzNVwvZGZnanRvYi0yZmNlMGQ0OC04MTczLTQ0NzYtOGQ2NS01NWRmYTczYjM1OGYucG5nIiwid2lkdGgiOiI8PTEyODAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.hVxySQNAxPCj5abYFSylBCTDxrHP4HsLKJd7pXNXrfE'),
+                      ),
                 Positioned(
                   bottom: -10,
-                  left:80,
+                  left: 80,
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: selectImage,
                     icon: const Icon(Icons.add_a_photo),
                   ),
                 )
@@ -74,7 +91,6 @@ class SignupScreenState extends State<SignupScreen> {
               hintText: "Enter your username",
               textInputType: TextInputType.text,
               textEditingController: _usernameController,
-              isPass: true,
             ),
 
             const SizedBox(
@@ -109,7 +125,6 @@ class SignupScreenState extends State<SignupScreen> {
               hintText: "Enter your bio",
               textInputType: TextInputType.text,
               textEditingController: _bioController,
-              isPass: true,
             ),
 
             const SizedBox(
@@ -117,9 +132,16 @@ class SignupScreenState extends State<SignupScreen> {
             ),
             //button login
             InkWell(
-              onTap: () {},
+              onTap: () async {
+                String res = await AuthMethods().signUpUser(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    username: _usernameController.text,
+                    bio: _bioController.text);
+                print(res);
+              },
               child: Container(
-                child: const Text("Log in"),
+                child: const Text("Sign up"),
                 width: double.infinity,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 12),
