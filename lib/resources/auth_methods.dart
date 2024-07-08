@@ -51,7 +51,8 @@ class AuthMethods {
 
         res = 'Success';
       }
-    } catch (err) {
+    } 
+    catch (err) {
       res = err.toString();
     }
     return res;
