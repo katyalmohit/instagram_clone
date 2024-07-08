@@ -57,6 +57,9 @@ class SignupScreenState extends State<SignupScreen> {
     } else {
       //
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
