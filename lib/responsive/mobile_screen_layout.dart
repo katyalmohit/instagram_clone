@@ -46,7 +46,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           Text('notifications'),
           Text('profile'),
         ],
-        // physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
         onPageChanged: onPageChanged,
       ),
