@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
@@ -14,11 +15,11 @@ void main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyDYgDMTkE2ts04Z1VvPSb0tolb1XcSVxqc",
-        appId: "1:674103629216:web:d71a2204546622a0d800c5",
-        messagingSenderId: "674103629216",
-        projectId: "instagram-clone-b8e27",
-        storageBucket: "instagram-clone-b8e27.appspot.com",
+        apiKey: "AIzaSyDCt8pWtRJU5TtL83WHGJ86pArCOrRAwn0",
+        appId: "1:949276769787:web:4f54bf87e586dd94bfdf5e",
+        messagingSenderId: "949276769787",
+        projectId: "instagram-clone-52737",
+        storageBucket: "instagram-clone-52737.appspot.com",
       ),
     );
   } else {
@@ -43,7 +44,31 @@ class MyApp extends StatelessWidget {
       //   mobileScreenLayout: MobileScreenLayout(),
       //   webScreenLayout: WebScreenLayout(),
       // ),
-      home:LoginScreen(),
+      home:StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot){
+          if(snapshot.connectionState == ConnectionState.active){
+            if(snapshot.hasData){
+              return const ResponsiveLayout(
+                webScreenLayout: WebScreenLayout(), 
+                mobileScreenLayout: MobileScreenLayout(),
+              );
+            }else if(snapshot.hasError){
+              return Center(
+                child: Text('${snapshot.error}'),
+              );
+            }
+          }
+          if (snapshot.connectionState == ConnectionState.waiting){
+            return Center(
+              child: CircularProgressIndicator(
+                color: primaryColor,
+                ),
+            );
+          }
+          return const LoginScreen();
+        }
+      ),
     );
   }
 }
