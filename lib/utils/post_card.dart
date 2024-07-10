@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
+import 'package:instagram_clone/resources/firestore_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +17,6 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
-
   bool isLikeAnimating = false;
 
   @override
@@ -66,7 +66,8 @@ class _PostCardState extends State<PostCard> {
                             shrinkWrap: true,
                             children: [
                               'Delete',
-                            ].map(
+                            ]
+                                .map(
                                   (e) => InkWell(
                                     onTap: () {},
                                     child: Container(
@@ -90,15 +91,17 @@ class _PostCardState extends State<PostCard> {
 
           //IMAGE SECTION
           GestureDetector(
-            onDoubleTap: (){
+            onDoubleTap: () async {
+              await FirestoreMethods().likePost(
+                  widget.snap['postId'], user.uid, widget.snap['likes']);
               setState(() {
                 isLikeAnimating = true;
               });
             },
             child: Stack(
               alignment: Alignment.center,
-                children: [
-                  SizedBox(
+              children: [
+                SizedBox(
                   height: MediaQuery.of(context).size.height * 0.35,
                   width: double.infinity,
                   child: Image.network(
@@ -108,17 +111,21 @@ class _PostCardState extends State<PostCard> {
                 ),
                 AnimatedOpacity(
                   duration: const Duration(milliseconds: 200),
-                  opacity:isLikeAnimating?1:0,
-                  child: LikeAnimation(child: const Icon(Icons.favorite, color: Colors.white, size:120), isAnimation: isLikeAnimating, duration: const Duration(milliseconds: 400),
-                  onEnd: (){
-                    setState(() {
-                      isLikeAnimating = false;
-                    });
-                  },),
+                  opacity: isLikeAnimating ? 1 : 0,
+                  child: LikeAnimation(
+                    child: const Icon(Icons.favorite,
+                        color: Colors.white, size: 120),
+                    isAnimation: isLikeAnimating,
+                    duration: const Duration(milliseconds: 400),
+                    onEnd: () {
+                      setState(() {
+                        isLikeAnimating = false;
+                      });
+                    },
+                  ),
                 )
               ],
-              ),
-            
+            ),
           ),
 
           //LIKE COMMENT SECTION
@@ -128,11 +135,14 @@ class _PostCardState extends State<PostCard> {
                 isAnimation: widget.snap['likes'].contains(user.uid),
                 smallLike: true,
                 child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
+                  onPressed: () async {
+                    await FirestoreMethods().likePost(
+                        widget.snap['postId'], user.uid, widget.snap['likes']);
+                  },
+                  icon: widget.snap['likes'].contains(user.uid) ?const Icon(
                     Icons.favorite,
                     color: Colors.red,
-                  ),
+                  ):const Icon(Icons.favorite_border)
                 ),
               ),
               IconButton(
