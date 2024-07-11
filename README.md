@@ -1,6 +1,6 @@
 # instagram_clone
 
-A new Flutter project.
+This is my first flutter project which uses firebase as backend. This project is made with the help of the tutorial by [freecodecamp](https://youtu.be/mEPm9w5QlJM?feature=shared).
 
 ## Getting Started
 
