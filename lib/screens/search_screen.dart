@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +54,24 @@ class _SearchScreenState extends State<SearchScreen> {
         },
         );
       },
-      ): Text('posts')
+      )
+      : FutureBuilder(
+        future: FirebaseFirestore.instance.collection('posts').get(),
+        builder: (context, snapshot){
+        if(!snapshot.hasData){
+          return const Center(child: CircularProgressIndicator(),);
+        }
+         return MasonryGridView.count(
+                  crossAxisCount: 3,
+                  itemCount: (snapshot.data! as dynamic).docs.length,
+                  itemBuilder: (context, index) => Image.network(
+                    (snapshot.data! as dynamic).docs[index]['postUrl'],
+                    fit: BoxFit.cover,
+                  ),
+                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 8.0,
+                );
+      })
     );
   }
 }
